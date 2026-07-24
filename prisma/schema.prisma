@@ -18,6 +18,17 @@ enum MetricSection {
   OUTPUT
 }
 
+enum MetricType {
+  GAUGE
+  STATUS
+}
+
+enum StatusLevel {
+  GOOD
+  WATCH
+  RISK
+}
+
 model Department {
   id        String   @id @default(cuid())
   key       String   @unique
@@ -42,10 +53,18 @@ model MetricItem {
   key          String
   section      MetricSection
   label        String
+  type         MetricType    @default(GAUGE)
+
+  // Used when type = GAUGE
   unit         String        @default("%")
   higherBetter Boolean       @default(true)
   target       Float         @default(100)
   actual       Float         @default(0)
+
+  // Used when type = STATUS
+  status       StatusLevel   @default(GOOD)
+  note         String        @default("")
+
   order        Int           @default(0)
   departmentId String
   department   Department    @relation(fields: [departmentId], references: [id])
@@ -58,13 +77,16 @@ model MetricItem {
 }
 
 model MetricItemHistory {
-  id           String     @id @default(cuid())
+  id           String       @id @default(cuid())
   metricItemId String
-  metricItem   MetricItem @relation(fields: [metricItemId], references: [id], onDelete: Cascade)
-  target       Float
-  actual       Float
+  metricItem   MetricItem   @relation(fields: [metricItemId], references: [id], onDelete: Cascade)
+  type         MetricType   @default(GAUGE)
+  target       Float?
+  actual       Float?
+  status       StatusLevel?
+  note         String?
   changedBy    String? // email of the user who made the change
-  changedAt    DateTime   @default(now())
+  changedAt    DateTime     @default(now())
 
   @@index([metricItemId])
 }

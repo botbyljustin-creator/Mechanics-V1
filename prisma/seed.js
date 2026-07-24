@@ -188,6 +188,10 @@ async function main() {
     // These start untracked (actual 0, target 100, unit %) — there's no
     // sensible default number to invent per bullet, so real values get
     // filled in via the department page once someone owns tracking them.
+    // New bullets default to STATUS (a highlight/red-flag, not a number) —
+    // most Includes/Outputs items describe a process, not a percentage.
+    // Existing rows are untouched by this upsert (update: {}), so nothing
+    // already tracked as a number gets silently switched.
     const bulletSections = [
       ["INCLUDE", dept.includes],
       ["OUTPUT", dept.outputs],
@@ -203,6 +207,9 @@ async function main() {
             section,
             label,
             order,
+            type: "STATUS",
+            status: "GOOD",
+            note: "",
             departmentId: department.id,
           },
         });

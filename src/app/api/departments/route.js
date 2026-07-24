@@ -7,10 +7,13 @@ function serializeMetric(m) {
     id: m.id,
     key: m.key,
     label: m.label,
+    type: m.type,
     unit: m.unit,
     higherBetter: m.higherBetter,
     target: m.target,
     actual: m.actual,
+    status: m.status,
+    note: m.note,
     updatedAt: m.updatedAt,
   };
 }

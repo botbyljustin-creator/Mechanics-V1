@@ -16,3 +16,13 @@ export function healthOf(kpi) {
 export const HEALTH_COLOR = { good: "var(--green)", warn: "var(--amber)", bad: "var(--red)" };
 
 export const FLOW_CHAIN = ["Business Development", "Operations", "Billing", "Collections", "Cash Flow", "Hiring Capacity", "Growth"];
+
+export const STATUS_LEVELS = ["GOOD", "WATCH", "RISK"];
+
+export const STATUS_LABEL = { GOOD: "On Track", WATCH: "Watch", RISK: "Red Flag" };
+
+export function statusHealth(status) {
+  if (status === "RISK") return "bad";
+  if (status === "WATCH") return "warn";
+  return "good";
+}

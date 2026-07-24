@@ -11,11 +11,18 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
 - **Department view** — KPI Gauges at the top, then Includes/Outputs,
   then SOPs.
 - **Includes / Outputs as metrics** — every bullet under "Includes" and
-  "Outputs" (e.g. "Lead generation") is its own trackable metric, not
-  just a label. Click a bullet to expand it into a gauge with its
-  current value, target, and (if you can edit that department) a
-  pencil icon to update it. New bullets start untracked (0 actual /
-  100 target) until someone enters a real number.
+  "Outputs" (e.g. "Lead generation") is its own trackable item, not
+  just a label. Click a bullet to expand it. Each one can be tracked
+  either way:
+  - **Number** — a gauge with an actual value and a target, same as
+    the KPI gauges.
+  - **Status** — a highlight/red-flag: On Track / Watch / Red Flag,
+    plus a short freeform note. Better fit for things that aren't
+    naturally a percentage (most Includes/Outputs bullets).
+  Whoever can edit a department can switch a bullet between the two
+  at any time — the toggle is right there in the edit view. Existing
+  numeric bullets stay numeric until someone deliberately switches
+  them; new bullets default to Status.
 - **Accounts** — one login per department (department head), one
   Leadership account, and one Admin account.
 - **Permissions** — everyone can view every department read-only.
