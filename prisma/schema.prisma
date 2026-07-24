@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  LEADERSHIP
+  DEPT_HEAD
+}
+
+model Department {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  short     String
+  icon      String
+  purpose   String
+  includes  String // JSON-stringified array of strings
+  outputs   String // JSON-stringified array of strings
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  kpis  Kpi[]
+  sops  Sop[]
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         Role
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Kpi {
+  id           String   @id @default(cuid())
+  key          String
+  name         String
+  unit         String
+  higherBetter Boolean  @default(true)
+  target       Float
+  actual       Float
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  history KpiHistory[]
+
+  @@unique([departmentId, key])
+}
+
+model KpiHistory {
+  id        String   @id @default(cuid())
+  kpiId     String
+  kpi       Kpi      @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+  target    Float
+  actual    Float
+  changedBy String? // email of the user who made the change
+  changedAt DateTime @default(now())
+
+  @@index([kpiId])
+}
+
+model Sop {
+  id           String     @id @default(cuid())
+  title        String
+  body         String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  updatedBy    String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
