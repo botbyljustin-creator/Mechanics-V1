@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Hub } from "@/components/Hub";
 import { Flow } from "@/components/Flow";
 import { DeptView } from "@/components/DeptView";
+import { MetricDetailPane } from "@/components/MetricDetailPane";
 import { AccountMenu } from "@/components/AccountMenu";
 
 function canEditDepartment(user, departmentKey) {
@@ -16,7 +17,13 @@ export default function MechanicsOS() {
   const [user, setUser] = useState(null);
   const [departments, setDepartments] = useState(null);
   const [view, setView] = useState("dashboard");
+  const [detail, setDetail] = useState(null); // { deptKey, metricId } | null
   const [error, setError] = useState(null);
+
+  function navigateTo(key) {
+    setDetail(null);
+    setView(key);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +128,8 @@ export default function MechanicsOS() {
 
   const activeDept = departments && view !== "dashboard" ? departments.find((d) => d.key === view) : null;
   const activeIndex = activeDept ? departments.findIndex((d) => d.key === view) : -1;
+  const detailMetric =
+    detail && activeDept ? [...activeDept.includes, ...activeDept.outputs].find((m) => m.id === detail.metricId) : null;
 
   return (
     <div className="app">
@@ -146,41 +155,51 @@ export default function MechanicsOS() {
       ) : view === "dashboard" ? (
         <>
           <div className="rail">
-            <button className="rail-btn active" onClick={() => setView("dashboard")}>
+            <button className="rail-btn active" onClick={() => navigateTo("dashboard")}>
               DASHBOARD
             </button>
             {departments.map((d) => (
-              <button key={d.key} className="rail-btn" onClick={() => setView(d.key)}>
+              <button key={d.key} className="rail-btn" onClick={() => navigateTo(d.key)}>
                 {d.short.toUpperCase()}
               </button>
             ))}
           </div>
-          <Hub departments={departments} onSelect={setView} />
+          <Hub departments={departments} onSelect={navigateTo} />
           <Flow />
         </>
       ) : (
         <>
           <div className="rail">
-            <button className="rail-btn" onClick={() => setView("dashboard")}>
+            <button className="rail-btn" onClick={() => navigateTo("dashboard")}>
               DASHBOARD
             </button>
             {departments.map((d) => (
-              <button key={d.key} className={`rail-btn ${view === d.key ? "active" : ""}`} onClick={() => setView(d.key)}>
+              <button key={d.key} className={`rail-btn ${view === d.key ? "active" : ""}`} onClick={() => navigateTo(d.key)}>
                 {d.short.toUpperCase()}
               </button>
             ))}
           </div>
-          <DeptView
-            dept={activeDept}
-            index={activeIndex}
-            canEdit={canEditDepartment(user, activeDept.key)}
-            onBack={() => setView("dashboard")}
-            onKpiChange={(kpiId, updated) => handleKpiChange(activeDept.key, kpiId, updated)}
-            onMetricChange={(metricId, updated) => handleMetricChange(activeDept.key, metricId, updated)}
-            onSopAdd={(sop) => handleSopAdd(activeDept.key, sop)}
-            onSopEdit={(sopId, sop) => handleSopEdit(activeDept.key, sopId, sop)}
-            onSopDelete={(sopId) => handleSopDelete(activeDept.key, sopId)}
-          />
+          {detail && detailMetric ? (
+            <MetricDetailPane
+              metric={detailMetric}
+              deptKey={activeDept.key}
+              deptName={activeDept.name}
+              onBack={() => setDetail(null)}
+            />
+          ) : (
+            <DeptView
+              dept={activeDept}
+              index={activeIndex}
+              canEdit={canEditDepartment(user, activeDept.key)}
+              onBack={() => navigateTo("dashboard")}
+              onKpiChange={(kpiId, updated) => handleKpiChange(activeDept.key, kpiId, updated)}
+              onMetricChange={(metricId, updated) => handleMetricChange(activeDept.key, metricId, updated)}
+              onOpenMetricDetail={(metric) => setDetail({ deptKey: activeDept.key, metricId: metric.id })}
+              onSopAdd={(sop) => handleSopAdd(activeDept.key, sop)}
+              onSopEdit={(sopId, sop) => handleSopEdit(activeDept.key, sopId, sop)}
+              onSopDelete={(sopId) => handleSopDelete(activeDept.key, sopId)}
+            />
+          )}
         </>
       )}
     </div>

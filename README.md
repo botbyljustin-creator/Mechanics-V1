@@ -23,6 +23,12 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
   at any time — the toggle is right there in the edit view. Existing
   numeric bullets stay numeric until someone deliberately switches
   them; new bullets default to Status.
+- **Metric detail pane** — click "View full history" on an expanded
+  bullet to open a dedicated in-app pane for that item: current
+  value/status, and a full timeline of every past change (who changed
+  it, when, old value/status → new). There's also a placeholder
+  "Reports" section for a planned feature: weekly automated report
+  ingestion isn't built yet, but the pane's ready for it.
 - **Accounts** — one login per department (department head), one
   Leadership account, and one Admin account.
 - **Permissions** — everyone can view every department read-only.

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight, Pencil, Check, X } from "lucide-react";
+import { ChevronRight, Pencil, Check, X, ArrowUpRight } from "lucide-react";
 import { formatValue, healthOf, HEALTH_COLOR, STATUS_LEVELS, STATUS_LABEL, statusHealth } from "@/lib/kpi";
 
-export function MetricBullet({ metric, canEdit, onChange }) {
+export function MetricBullet({ metric, canEdit, onChange, onOpenDetail }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -95,11 +95,16 @@ export function MetricBullet({ metric, canEdit, onChange }) {
                   {metric.note ? <p className="status-note">{metric.note}</p> : <p className="status-note muted">No notes yet.</p>}
                 </div>
               )}
-              {canEdit && (
-                <button className="icon-btn metric-edit-trigger" onClick={startEdit} aria-label={`Edit ${metric.label}`}>
-                  <Pencil size={13} strokeWidth={1.75} />
+              <div className="metric-detail-actions">
+                <button className="text-btn metric-detail-link" onClick={() => onOpenDetail(metric)}>
+                  <ArrowUpRight size={12} /> View full history
                 </button>
-              )}
+                {canEdit && (
+                  <button className="icon-btn" onClick={startEdit} aria-label={`Edit ${metric.label}`}>
+                    <Pencil size={13} strokeWidth={1.75} />
+                  </button>
+                )}
+              </div>
             </>
           ) : (
             <div className="metric-edit-form">

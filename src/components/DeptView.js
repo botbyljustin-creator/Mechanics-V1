@@ -14,6 +14,7 @@ export function DeptView({
   onBack,
   onKpiChange,
   onMetricChange,
+  onOpenMetricDetail,
   onSopAdd,
   onSopEdit,
   onSopDelete,
@@ -62,6 +63,7 @@ export function DeptView({
                 metric={metric}
                 canEdit={canEdit}
                 onChange={(updated) => onMetricChange(metric.id, updated)}
+                onOpenDetail={onOpenMetricDetail}
               />
             ))}
           </div>
@@ -78,6 +80,7 @@ export function DeptView({
                 metric={metric}
                 canEdit={canEdit}
                 onChange={(updated) => onMetricChange(metric.id, updated)}
+                onOpenDetail={onOpenMetricDetail}
               />
             ))}
           </div>
