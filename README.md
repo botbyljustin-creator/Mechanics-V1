@@ -8,16 +8,25 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
 
 - **Hub dashboard** — the schematic wheel view of all 6 departments with
   live health indicators, plus the cause-and-effect flow panel.
-- **Department view** — KPI gauges and SOPs per department.
+- **Department view** — KPI Gauges at the top, then Includes/Outputs,
+  then SOPs.
+- **Includes / Outputs as metrics** — every bullet under "Includes" and
+  "Outputs" (e.g. "Lead generation") is its own trackable metric, not
+  just a label. Click a bullet to expand it into a gauge with its
+  current value, target, and (if you can edit that department) a
+  pencil icon to update it. New bullets start untracked (0 actual /
+  100 target) until someone enters a real number.
 - **Accounts** — one login per department (department head), one
   Leadership account, and one Admin account.
 - **Permissions** — everyone can view every department read-only.
-  A department head can edit their own department's KPIs and SOPs.
-  Leadership and Admin can edit every department.
+  A department head can edit their own department's KPIs, Includes/
+  Outputs metrics, and SOPs. Leadership and Admin can edit every
+  department.
 - **Data** — PostgreSQL database (via Prisma) with real tables:
-  `Department`, `User`, `Kpi`, `KpiHistory`, `Sop`. Every KPI edit is
-  appended to `KpiHistory` (who changed it, old/new values, when) so
-  nothing is silently overwritten.
+  `Department`, `User`, `Kpi`, `KpiHistory`, `MetricItem`,
+  `MetricItemHistory`, `Sop`. Every KPI and metric edit is appended to
+  its history table (who changed it, old/new values, when) so nothing
+  is silently overwritten.
 
 ## Free hosted demo (Vercel + Neon)
 
@@ -93,11 +102,13 @@ that's a manual step for now.
 
 ## How it's built
 
-- `prisma/schema.prisma` — the 5 tables (`Department`, `User`, `Kpi`,
-  `KpiHistory`, `Sop`) and the `Role` enum (`ADMIN`, `LEADERSHIP`,
-  `DEPT_HEAD`).
+- `prisma/schema.prisma` — the 7 tables (`Department`, `User`, `Kpi`,
+  `KpiHistory`, `MetricItem`, `MetricItemHistory`, `Sop`) and the
+  `Role` (`ADMIN`, `LEADERSHIP`, `DEPT_HEAD`) and `MetricSection`
+  (`INCLUDE`, `OUTPUT`) enums.
 - `prisma/seed.js` — loads the 6 departments/KPIs/SOPs (carried over
-  1:1 from the original prototype and the Mechanics reference doc) and
+  1:1 from the original prototype and the Mechanics reference doc),
+  creates a `MetricItem` row for every Includes/Outputs bullet, and
   creates the 7 accounts.
 - `src/lib/auth.js` — password hashing (bcrypt) and session JWTs
   (`jose`), signed and verified with `JWT_SECRET`.

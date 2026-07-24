@@ -4,9 +4,20 @@ import { ArrowLeft } from "lucide-react";
 import { Panel } from "./Panel";
 import { KpiGauge } from "./KpiGauge";
 import { SopList } from "./SopList";
+import { MetricBullet } from "./MetricBullet";
 import { getDepartmentIcon } from "./icons";
 
-export function DeptView({ dept, index, canEdit, onBack, onKpiChange, onSopAdd, onSopEdit, onSopDelete }) {
+export function DeptView({
+  dept,
+  index,
+  canEdit,
+  onBack,
+  onKpiChange,
+  onMetricChange,
+  onSopAdd,
+  onSopEdit,
+  onSopDelete,
+}) {
   const Icon = getDepartmentIcon(dept.icon);
 
   return (
@@ -29,25 +40,6 @@ export function DeptView({ dept, index, canEdit, onBack, onKpiChange, onSopAdd, 
         </div>
       </div>
 
-      <div className="dept-grid">
-        <Panel>
-          <div className="panel-title">INCLUDES</div>
-          <ul className="plain-list">
-            {dept.includes.map((i) => (
-              <li key={i}>{i}</li>
-            ))}
-          </ul>
-        </Panel>
-        <Panel>
-          <div className="panel-title">OUTPUTS</div>
-          <ul className="plain-list">
-            {dept.outputs.map((i) => (
-              <li key={i}>{i}</li>
-            ))}
-          </ul>
-        </Panel>
-      </div>
-
       <Panel>
         <div className="panel-title">KPI GAUGES</div>
         <div className="gauge-grid">
@@ -56,6 +48,41 @@ export function DeptView({ dept, index, canEdit, onBack, onKpiChange, onSopAdd, 
           ))}
         </div>
       </Panel>
+
+      <div className="dept-grid">
+        <Panel>
+          <div className="panel-title">
+            <span>INCLUDES</span>
+            <span className="panel-title-badge">click to view metric</span>
+          </div>
+          <div className="metric-bullet-list">
+            {dept.includes.map((metric) => (
+              <MetricBullet
+                key={metric.id}
+                metric={metric}
+                canEdit={canEdit}
+                onChange={(updated) => onMetricChange(metric.id, updated)}
+              />
+            ))}
+          </div>
+        </Panel>
+        <Panel>
+          <div className="panel-title">
+            <span>OUTPUTS</span>
+            <span className="panel-title-badge">click to view metric</span>
+          </div>
+          <div className="metric-bullet-list">
+            {dept.outputs.map((metric) => (
+              <MetricBullet
+                key={metric.id}
+                metric={metric}
+                canEdit={canEdit}
+                onChange={(updated) => onMetricChange(metric.id, updated)}
+              />
+            ))}
+          </div>
+        </Panel>
+      </div>
 
       <Panel>
         <div className="panel-title">STANDARD OPERATING PROCEDURES</div>

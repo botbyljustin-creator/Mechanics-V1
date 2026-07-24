@@ -13,6 +13,11 @@ enum Role {
   DEPT_HEAD
 }
 
+enum MetricSection {
+  INCLUDE
+  OUTPUT
+}
+
 model Department {
   id        String   @id @default(cuid())
   key       String   @unique
@@ -20,15 +25,48 @@ model Department {
   short     String
   icon      String
   purpose   String
-  includes  String // JSON-stringified array of strings
-  outputs   String // JSON-stringified array of strings
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
-  kpis  Kpi[]
-  sops  Sop[]
+  users       User[]
+  kpis        Kpi[]
+  sops        Sop[]
+  metricItems MetricItem[]
+}
+
+// One row per "Includes" / "Outputs" bullet — each bullet is its own
+// trackable, editable metric (not just static label text).
+model MetricItem {
+  id           String        @id @default(cuid())
+  key          String
+  section      MetricSection
+  label        String
+  unit         String        @default("%")
+  higherBetter Boolean       @default(true)
+  target       Float         @default(100)
+  actual       Float         @default(0)
+  order        Int           @default(0)
+  departmentId String
+  department   Department    @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  history MetricItemHistory[]
+
+  @@unique([departmentId, section, key])
+}
+
+model MetricItemHistory {
+  id           String     @id @default(cuid())
+  metricItemId String
+  metricItem   MetricItem @relation(fields: [metricItemId], references: [id], onDelete: Cascade)
+  target       Float
+  actual       Float
+  changedBy    String? // email of the user who made the change
+  changedAt    DateTime   @default(now())
+
+  @@index([metricItemId])
 }
 
 model User {

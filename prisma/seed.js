@@ -3,6 +3,13 @@ const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
+function slugify(label) {
+  return label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
 /* ---------------------------------------------------------------
    Source data — carried over 1:1 from the mechanics-os.jsx prototype
    and the Mechanics reference doc. This is seed data only; once the
@@ -149,8 +156,6 @@ async function main() {
         short: dept.short,
         icon: dept.icon,
         purpose: dept.purpose,
-        includes: JSON.stringify(dept.includes),
-        outputs: JSON.stringify(dept.outputs),
         order: index,
       },
       create: {
@@ -159,8 +164,6 @@ async function main() {
         short: dept.short,
         icon: dept.icon,
         purpose: dept.purpose,
-        includes: JSON.stringify(dept.includes),
-        outputs: JSON.stringify(dept.outputs),
         order: index,
       },
     });
@@ -179,6 +182,31 @@ async function main() {
           departmentId: department.id,
         },
       });
+    }
+
+    // Every "Includes" / "Outputs" bullet becomes its own trackable metric.
+    // These start untracked (actual 0, target 100, unit %) — there's no
+    // sensible default number to invent per bullet, so real values get
+    // filled in via the department page once someone owns tracking them.
+    const bulletSections = [
+      ["INCLUDE", dept.includes],
+      ["OUTPUT", dept.outputs],
+    ];
+    for (const [section, labels] of bulletSections) {
+      for (const [order, label] of labels.entries()) {
+        const key = slugify(label);
+        await prisma.metricItem.upsert({
+          where: { departmentId_section_key: { departmentId: department.id, section, key } },
+          update: {},
+          create: {
+            key,
+            section,
+            label,
+            order,
+            departmentId: department.id,
+          },
+        });
+      }
     }
 
     const existingSops = await prisma.sop.count({ where: { departmentId: department.id } });

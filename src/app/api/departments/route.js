@@ -2,6 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 
+function serializeMetric(m) {
+  return {
+    id: m.id,
+    key: m.key,
+    label: m.label,
+    unit: m.unit,
+    higherBetter: m.higherBetter,
+    target: m.target,
+    actual: m.actual,
+    updatedAt: m.updatedAt,
+  };
+}
+
 function serializeDepartment(dept) {
   return {
     key: dept.key,
@@ -9,9 +22,9 @@ function serializeDepartment(dept) {
     short: dept.short,
     icon: dept.icon,
     purpose: dept.purpose,
-    includes: JSON.parse(dept.includes),
-    outputs: JSON.parse(dept.outputs),
     order: dept.order,
+    includes: dept.metricItems.filter((m) => m.section === "INCLUDE").map(serializeMetric),
+    outputs: dept.metricItems.filter((m) => m.section === "OUTPUT").map(serializeMetric),
     kpis: dept.kpis.map((k) => ({
       id: k.id,
       key: k.key,
@@ -43,6 +56,7 @@ export async function GET() {
     include: {
       kpis: { orderBy: { createdAt: "asc" } },
       sops: { orderBy: { createdAt: "asc" } },
+      metricItems: { orderBy: { order: "asc" } },
     },
   });
 

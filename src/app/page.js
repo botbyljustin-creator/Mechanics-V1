@@ -56,6 +56,30 @@ export default function MechanicsOS() {
     );
   }, []);
 
+  const handleMetricChange = useCallback(async (deptKey, metricId, updated) => {
+    const res = await fetch(`/api/departments/${deptKey}/metrics/${metricId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    });
+    if (!res.ok) {
+      setError("Could not save that metric change.");
+      return;
+    }
+    const saved = await res.json();
+    setDepartments((prev) =>
+      prev.map((d) =>
+        d.key !== deptKey
+          ? d
+          : {
+              ...d,
+              includes: d.includes.map((m) => (m.id === metricId ? saved : m)),
+              outputs: d.outputs.map((m) => (m.id === metricId ? saved : m)),
+            }
+      )
+    );
+  }, []);
+
   const handleSopAdd = useCallback(async (deptKey, sop) => {
     const res = await fetch(`/api/departments/${deptKey}/sops`, {
       method: "POST",
@@ -152,6 +176,7 @@ export default function MechanicsOS() {
             canEdit={canEditDepartment(user, activeDept.key)}
             onBack={() => setView("dashboard")}
             onKpiChange={(kpiId, updated) => handleKpiChange(activeDept.key, kpiId, updated)}
+            onMetricChange={(metricId, updated) => handleMetricChange(activeDept.key, metricId, updated)}
             onSopAdd={(sop) => handleSopAdd(activeDept.key, sop)}
             onSopEdit={(sopId, sop) => handleSopEdit(activeDept.key, sopId, sop)}
             onSopDelete={(sopId) => handleSopDelete(activeDept.key, sopId)}
