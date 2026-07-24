@@ -2,7 +2,7 @@
 
 Internal operating system for the 6 Mechanics business systems (Business
 Development, Operations, Finance, People, Technology & Automation,
-Leadership). Next.js + SQLite (via Prisma), single deployable app.
+Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
 
 ## What this is
 
@@ -14,26 +14,58 @@ Leadership). Next.js + SQLite (via Prisma), single deployable app.
 - **Permissions** — everyone can view every department read-only.
   A department head can edit their own department's KPIs and SOPs.
   Leadership and Admin can edit every department.
-- **Data** — SQLite database (via Prisma) with real tables:
+- **Data** — PostgreSQL database (via Prisma) with real tables:
   `Department`, `User`, `Kpi`, `KpiHistory`, `Sop`. Every KPI edit is
   appended to `KpiHistory` (who changed it, old/new values, when) so
   nothing is silently overwritten.
 
+## Free hosted demo (Vercel + Neon)
+
+The fastest way to get a real clickable URL, at $0 and no local install:
+
+1. **Create a free Postgres database at [neon.tech](https://neon.tech).**
+   Sign up, create a project, and copy the connection string it gives you
+   (looks like `postgresql://user:password@ep-xxxx.neon.tech/neondb?sslmode=require`).
+2. **Deploy to [vercel.com](https://vercel.com).** Sign up with your
+   GitHub account, click **Add New → Project**, and import this repo
+   (`botbyljustin-creator/mechanics-v1`, branch `claude/mechanics-os-web-app-2k3qhg`
+   or whatever it's been merged into). Vercel auto-detects Next.js — no
+   config needed.
+3. **Set environment variables** in the Vercel project settings before
+   (or right after) the first deploy:
+   - `DATABASE_URL` — the Neon connection string from step 1
+   - `JWT_SECRET` — any long random string (e.g. from `openssl rand -base64 48`)
+   - `SEED_DEFAULT_PASSWORD` — optional, defaults to `ChangeMe123!`
+4. **Apply the schema and load starting data.** Vercel runs the app but
+   won't create tables or accounts for you. From any machine with
+   internet access (this includes asking whoever set this up to run it
+   once), with `DATABASE_URL` set to the same Neon connection string:
+   ```bash
+   npx prisma migrate deploy
+   npm run prisma:seed
+   ```
+5. Open the `.vercel.app` URL Vercel gives you, and log in with one of
+   the seeded accounts below.
+
+This gets you a real, working, permanent link. It's still a third-party
+host, not your internal server — see the next section for that move.
+
 ## Running it locally
 
-Requires Node 20+.
+Requires Node 20+ and a PostgreSQL database (a free Neon project works
+fine for this too — you don't need Postgres installed on your machine).
 
 ```bash
 npm install
-cp .env.example .env        # then edit .env (see below)
-npm run prisma:migrate      # creates prisma/dev.db and applies the schema
+cp .env.example .env        # then edit .env — set DATABASE_URL to your Postgres connection string
+npm run prisma:migrate      # applies the schema
 npm run prisma:seed         # loads the 6 departments + 7 accounts
 npm run dev                 # http://localhost:3000
 ```
 
-`.env` needs two values:
+`.env` needs:
 
-- `DATABASE_URL` — `file:./dev.db` is fine for local dev.
+- `DATABASE_URL` — a PostgreSQL connection string.
 - `JWT_SECRET` — any long random string. Generate one with
   `openssl rand -base64 48`.
 - `SEED_DEFAULT_PASSWORD` — the password every seeded account gets on
@@ -82,20 +114,21 @@ that's a manual step for now.
   styling, fonts, panel corners, gauges) is unchanged; the only
   difference is data now comes from the API instead of `window.storage`.
 
-## Deploying to the internal server
+## Deploying to your internal server
 
 This is a single deployable Next.js app — no separate frontend/backend
-to stand up. What changes between local dev and the internal server:
+to stand up. What changes between the free hosted demo and your own
+internal server:
 
-1. **Environment variables.** Set real values for `DATABASE_URL`,
-   `JWT_SECRET`, on the server (not the `.env` file — use whatever
+1. **Postgres.** Either keep using a Neon project (fine to run
+   production on the free tier's paid successor plans, or just keep it
+   external), or point `DATABASE_URL` at a Postgres instance on your
+   own network/server. Nothing else in the app changes either way.
+2. **Environment variables.** Set real values for `DATABASE_URL` and
+   `JWT_SECRET` on the server (not the `.env` file — use whatever
    secrets mechanism the server uses, e.g. a systemd `EnvironmentFile`
-   or your process manager's env config). Generate a fresh
-   `JWT_SECRET` for production — don't reuse the dev one.
-2. **Database location.** Point `DATABASE_URL` at a persistent path
-   outside the deploy directory (e.g. `file:/var/lib/mechanics-os/prod.db`)
-   so redeploys don't wipe or orphan the database. Back that file up —
-   it's the only copy of your KPI/SOP data.
+   or your process manager's env config). Generate a fresh `JWT_SECRET`
+   for production — don't reuse the dev/demo one.
 3. **Cookies over HTTPS.** The session cookie is marked `secure` when
    `NODE_ENV=production`, which requires the app to be served over
    HTTPS (or from behind a reverse proxy that terminates TLS and the
@@ -103,20 +136,19 @@ to stand up. What changes between local dev and the internal server:
    Caddy, IIS, etc.) with a real TLS cert, or the login cookie won't be
    set by browsers.
 4. **Build instead of dev.** Run `npm run build` once, then
-   `npm run start` (or `npm run prisma:deploy` — the non-interactive
-   equivalent of `prisma:migrate` — followed by `npm run start`) as the
-   long-running process, instead of `npm run dev`.
+   `npm run start` as the long-running process, instead of `npm run dev`.
 5. **Migrations.** Use `npm run prisma:deploy` (`prisma migrate
    deploy`) on the server instead of `prisma:migrate` — it applies
    already-created migrations without prompting or trying to create new
    ones from schema drift.
 6. **Seeding.** Only run `npm run prisma:seed` once, against the
-   production database, the first time you stand it up. Running it
-   again is safe (it upserts departments/KPIs/users rather than
-   duplicating them) but there's no reason to repeat it.
+   production database, the first time you stand it up (skip it if
+   you're pointing at the same Neon database the free demo already
+   seeded). Running it again is safe (it upserts departments/KPIs/users
+   rather than duplicating them) but there's no reason to repeat it.
 7. **Process manager.** Run `npm run start` under whatever keeps
    long-running services alive on your server (systemd, pm2, Docker,
    etc.) so it restarts on crash/reboot.
 
 Everything else — the schema, the auth model, the permission rules —
-is identical between local dev and the deployed app.
+is identical across local dev, the hosted demo, and your internal server.
