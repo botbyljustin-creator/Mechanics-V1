@@ -96,7 +96,7 @@ function ChangePasswordModal({ onClose }) {
         </div>
         {success ? (
           <>
-            <div className="login-field" style={{ color: "var(--green)", fontSize: 12.5 }}>
+            <div className="login-field" style={{ color: "var(--good)", fontSize: 12.5 }}>
               Password updated.
             </div>
             <button className="login-submit" onClick={onClose}>

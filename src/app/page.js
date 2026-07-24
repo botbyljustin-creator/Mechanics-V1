@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Hub } from "@/components/Hub";
-import { Flow } from "@/components/Flow";
+import { WhyMechanics } from "@/components/WhyMechanics";
 import { DeptView } from "@/components/DeptView";
 import { MetricDetailPane } from "@/components/MetricDetailPane";
 import { AccountMenu } from "@/components/AccountMenu";
@@ -165,7 +165,7 @@ export default function MechanicsOS() {
             ))}
           </div>
           <Hub departments={departments} onSelect={navigateTo} />
-          <Flow />
+          <WhyMechanics />
         </>
       ) : (
         <>

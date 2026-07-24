@@ -6,8 +6,16 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
 
 ## What this is
 
-- **Hub dashboard** — the schematic wheel view of all 6 departments with
-  live health indicators, plus the cause-and-effect flow panel.
+- **Light "Modern Ops" visual style** — white/soft-gray rounded cards
+  with subtle shadows, an indigo accent, Sora (headings) + Inter
+  (body) + IBM Plex Mono (data/labels). Replaces the original dark
+  blueprint/schematic look from the prototype.
+- **Hub dashboard** — the wheel view of all 6 departments with live
+  health indicators, plus a "Why Mechanics Matters" section (the
+  purpose statement, the "Mechanics exists to..." list, and a
+  Without Systems / With Systems comparison, all pulled from the
+  Mechanics reference doc) in place of the original cause-and-effect
+  flow diagram.
 - **Department view** — KPI Gauges at the top, then Includes/Outputs,
   then SOPs.
 - **Includes / Outputs as metrics** — every bullet under "Includes" and

@@ -13,9 +13,7 @@ export function healthOf(kpi) {
   return "bad";
 }
 
-export const HEALTH_COLOR = { good: "var(--green)", warn: "var(--amber)", bad: "var(--red)" };
-
-export const FLOW_CHAIN = ["Business Development", "Operations", "Billing", "Collections", "Cash Flow", "Hiring Capacity", "Growth"];
+export const HEALTH_COLOR = { good: "var(--good)", warn: "var(--warn)", bad: "var(--bad)" };
 
 export const STATUS_LEVELS = ["GOOD", "WATCH", "RISK"];
 

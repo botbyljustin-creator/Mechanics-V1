@@ -1,10 +1,10 @@
-import { Space_Grotesk, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Sora, IBM_Plex_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const sora = Sora({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-space-grotesk",
+  weight: ["600", "700"],
+  variable: "--font-sora",
   display: "swap",
 });
 
@@ -15,10 +15,10 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-const plexSans = IBM_Plex_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-plex-sans",
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -29,7 +29,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${plexMono.variable} ${plexSans.variable}`}>
+    <html lang="en" className={`${sora.variable} ${plexMono.variable} ${inter.variable}`}>
       <body>{children}</body>
     </html>
   );

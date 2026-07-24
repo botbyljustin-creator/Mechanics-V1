@@ -39,11 +39,6 @@ export default function LoginPage() {
   return (
     <div className="login-wrap">
       <div className="login-panel">
-        <span className="corner tl" />
-        <span className="corner tr" />
-        <span className="corner bl" />
-        <span className="corner br" />
-
         <div className="login-header">
           <div className="wordmark">
             MECHANICS<span>_OS</span>
