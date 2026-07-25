@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 import { canEditDepartment } from "@/lib/permissions";
 
+const HISTORY_POINTS = 8;
+
 export async function PATCH(request, { params }) {
   const session = await getSession();
   if (!session) {
@@ -48,6 +50,12 @@ export async function PATCH(request, { params }) {
     return updatedKpi;
   });
 
+  const historyDesc = await prisma.kpiHistory.findMany({
+    where: { kpiId },
+    orderBy: { changedAt: "desc" },
+    take: HISTORY_POINTS,
+  });
+
   return NextResponse.json({
     id: updated.id,
     key: updated.key,
@@ -57,5 +65,6 @@ export async function PATCH(request, { params }) {
     target: updated.target,
     actual: updated.actual,
     updatedAt: updated.updatedAt,
+    history: historyDesc.reverse().map((h) => ({ actual: h.actual, changedAt: h.changedAt })),
   });
 }

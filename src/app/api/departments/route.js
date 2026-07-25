@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/getSession";
 
+const HISTORY_POINTS = 8;
+
 function serializeMetric(m) {
   return {
     id: m.id,
@@ -37,6 +39,9 @@ function serializeDepartment(dept) {
       target: k.target,
       actual: k.actual,
       updatedAt: k.updatedAt,
+      // history was fetched desc (most recent first) for the `take` to
+      // grab the *latest* N rows; reverse to chronological for charting.
+      history: k.history.slice().reverse().map((h) => ({ actual: h.actual, changedAt: h.changedAt })),
     })),
     sops: dept.sops.map((s) => ({
       id: s.id,
@@ -57,7 +62,12 @@ export async function GET() {
   const departments = await prisma.department.findMany({
     orderBy: { order: "asc" },
     include: {
-      kpis: { orderBy: { createdAt: "asc" } },
+      kpis: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          history: { orderBy: { changedAt: "desc" }, take: HISTORY_POINTS },
+        },
+      },
       sops: { orderBy: { createdAt: "asc" } },
       metricItems: { orderBy: { order: "asc" } },
     },

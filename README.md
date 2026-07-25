@@ -27,7 +27,9 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
   department, worst-first, capped at 8 with a "+N more" note. Click any
   row (or any Trend gauge) to jump straight to that department.
 - **Department view** — KPI Gauges at the top, then Includes/Outputs,
-  then SOPs.
+  then SOPs. Every KPI gauge here (not just the one dashboard summary)
+  has its own sparkline and trend call-out, same "not enough history
+  yet" fallback when it hasn't been edited enough times yet.
 - **Includes / Outputs as metrics** — every bullet under "Includes" and
   "Outputs" (e.g. "Lead generation") is its own trackable item, not
   just a label. Click a bullet to expand it. Each one can be tracked

@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { Pencil, Check, X } from "lucide-react";
-import { formatValue, healthOf, HEALTH_COLOR } from "@/lib/kpi";
+import { Sparkline } from "./Sparkline";
+import { formatValue, healthOf, HEALTH_COLOR, trendDirection } from "@/lib/kpi";
+
+const TONE_COLOR = { good: "var(--good)", bad: "var(--bad)", muted: "var(--muted)" };
 
 export function KpiGauge({ kpi, canEdit, onChange }) {
   const [editing, setEditing] = useState(false);
@@ -14,6 +17,11 @@ export function KpiGauge({ kpi, canEdit, onChange }) {
   const max = Math.max(kpi.target, kpi.actual) * 1.15 || 1;
   const fillPct = Math.min((kpi.actual / max) * 100, 100);
   const targetPct = Math.min((kpi.target / max) * 100, 100);
+  const history = kpi.history || [];
+  const trend = trendDirection(
+    history.map((h) => h.actual),
+    kpi.higherBetter
+  );
 
   async function save() {
     setSaving(true);
@@ -64,6 +72,16 @@ export function KpiGauge({ kpi, canEdit, onChange }) {
           <div className="gauge-values">
             <span style={{ color: HEALTH_COLOR[health] }}>{formatValue(kpi.actual, kpi.unit)}</span>
             <span className="gauge-target-label">target {formatValue(kpi.target, kpi.unit)}</span>
+          </div>
+          <div className="sparkline-wrap">
+            <Sparkline history={history} color={HEALTH_COLOR[health]} />
+            {trend && (
+              <div className="trend-label">
+                <b style={{ color: TONE_COLOR[trend.tone] }}>
+                  {trend.arrow} {trend.word}
+                </b>
+              </div>
+            )}
           </div>
         </>
       ) : (
