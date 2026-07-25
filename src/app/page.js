@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Hub } from "@/components/Hub";
-import { WhyMechanics } from "@/components/WhyMechanics";
+import { WhyMechanicsView } from "@/components/WhyMechanicsView";
+import { TrendPanel } from "@/components/TrendPanel";
+import { AttentionRollup } from "@/components/AttentionRollup";
 import { DeptView } from "@/components/DeptView";
 import { MetricDetailPane } from "@/components/MetricDetailPane";
 import { AccountMenu } from "@/components/AccountMenu";
@@ -126,7 +128,7 @@ export default function MechanicsOS() {
     setDepartments((prev) => prev.map((d) => (d.key !== deptKey ? d : { ...d, sops: d.sops.filter((s) => s.id !== sopId) })));
   }, []);
 
-  const activeDept = departments && view !== "dashboard" ? departments.find((d) => d.key === view) : null;
+  const activeDept = departments && view !== "dashboard" && view !== "why" ? departments.find((d) => d.key === view) : null;
   const activeIndex = activeDept ? departments.findIndex((d) => d.key === view) : -1;
   const detailMetric =
     detail && activeDept ? [...activeDept.includes, ...activeDept.outputs].find((m) => m.id === detail.metricId) : null;
@@ -164,8 +166,23 @@ export default function MechanicsOS() {
               </button>
             ))}
           </div>
-          <Hub departments={departments} onSelect={navigateTo} />
-          <WhyMechanics />
+          <Hub departments={departments} onSelect={navigateTo} onSelectCenter={() => navigateTo("why")} />
+          <TrendPanel onSelectDepartment={navigateTo} />
+          <AttentionRollup onSelectDepartment={navigateTo} />
+        </>
+      ) : view === "why" ? (
+        <>
+          <div className="rail">
+            <button className="rail-btn" onClick={() => navigateTo("dashboard")}>
+              DASHBOARD
+            </button>
+            {departments.map((d) => (
+              <button key={d.key} className="rail-btn" onClick={() => navigateTo(d.key)}>
+                {d.short.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <WhyMechanicsView onBack={() => navigateTo("dashboard")} />
         </>
       ) : (
         <>

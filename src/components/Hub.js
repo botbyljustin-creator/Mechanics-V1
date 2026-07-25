@@ -3,7 +3,7 @@
 import { getDepartmentIcon } from "./icons";
 import { healthOf, HEALTH_COLOR } from "@/lib/kpi";
 
-export function Hub({ departments, onSelect }) {
+export function Hub({ departments, onSelect, onSelectCenter }) {
   const n = departments.length;
   const nodes = departments.map((d, i) => {
     const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
@@ -19,10 +19,10 @@ export function Hub({ departments, onSelect }) {
           <line key={node.key} x1="50" y1="50" x2={node.x} y2={node.y} className="hub-line" />
         ))}
       </svg>
-      <div className="hub-center">
+      <button className="hub-center" onClick={onSelectCenter} aria-label="Why Mechanics matters">
         <div className="hub-center-label">MECHANICS</div>
         <div className="hub-center-sub">the machine</div>
-      </div>
+      </button>
       {nodes.map((node) => {
         const avgHealth = node.kpis.length
           ? node.kpis.map(healthOf).reduce((acc, h) => (h === "bad" ? acc + 2 : h === "warn" ? acc + 1 : acc), 0) / node.kpis.length

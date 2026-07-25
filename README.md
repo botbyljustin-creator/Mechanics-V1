@@ -11,11 +11,21 @@ Leadership). Next.js + PostgreSQL (via Prisma), single deployable app.
   (body) + IBM Plex Mono (data/labels). Replaces the original dark
   blueprint/schematic look from the prototype.
 - **Hub dashboard** — the wheel view of all 6 departments with live
-  health indicators, plus a "Why Mechanics Matters" section (the
-  purpose statement, the "Mechanics exists to..." list, and a
-  Without Systems / With Systems comparison, all pulled from the
-  Mechanics reference doc) in place of the original cause-and-effect
-  flow diagram.
+  health indicators. The center circle ("MECHANICS / the machine") is
+  clickable — it opens "Why Mechanics Matters" (the purpose statement,
+  the "Mechanics exists to..." list, and a Without Systems / With
+  Systems comparison, all pulled from the Mechanics reference doc),
+  replacing the original cause-and-effect flow diagram.
+- **KPI Trends** — a dashboard panel showing one representative KPI per
+  department (whichever is in the worst health) with a sparkline of
+  its recent history and a plain-language trend call-out (improving /
+  worsening / flat). Sparse until a few weeks of real edits accumulate
+  — a KPI with 0–1 history points just shows "Not enough history yet"
+  instead of a fabricated trend.
+- **Needs Attention rollup** — a dashboard panel listing everything
+  currently in bad/warn health or flagged Watch/Red Flag, across every
+  department, worst-first, capped at 8 with a "+N more" note. Click any
+  row (or any Trend gauge) to jump straight to that department.
 - **Department view** — KPI Gauges at the top, then Includes/Outputs,
   then SOPs.
 - **Includes / Outputs as metrics** — every bullet under "Includes" and
